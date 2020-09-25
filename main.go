@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"hash"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -81,11 +82,11 @@ func main() {
 	}
 
 	fmt.Println(
-		"+-----------------------------+---------------------------------+" + "------------------+---------+----------+")
+		"+ -------------------+---------------------------------+" + "------------------+---------+----------+")
 	fmt.Println(
-		"|          Time(sec)          |         Time (UTC format)       " + "| Value of T(Hex)  |   TOTP  |   Mode   |")
+		"|       Time(sec)    |         Time (UTC format)       " + "| Value of T(Hex)  |   TOTP  |   Mode   |")
 	fmt.Println(
-		"+-----------------------------+---------------------------------+" + "------------------+---------+----------+")
+		"+--------------------+---------------------------------+" + "------------------+---------+----------+")
 
 	var T0 int64 = 0
 	var X int64 = 30
@@ -94,24 +95,29 @@ func main() {
 		T := (timeParam - T0) / X
 		timeHex := fmt.Sprintf("%x", T)
 
-		timeHexDisplay := timeHex
+		timeHexDisplay := strings.ToUpper(timeHex)
 		for x := len(timeHexDisplay); x < 16; x++ {
 			timeHexDisplay = "0" + timeHexDisplay
 		}
 
+		timeParamDisplay := strconv.Itoa(int(timeParam))
+		for x := len(timeParamDisplay); x < 16; x++ {
+			timeParamDisplay = timeParamDisplay + " "
+		}
+
 		res := generateTOTP(seed, timeHex, digit, sha1.New)
-		fmt.Print("|  ", time.Unix(timeParam, 0).Format(time.RFC3339), "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
+		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
 		fmt.Println(res, "| SHA1     |")
 
 		res2 := generateTOTP(seed32, timeHex, digit, sha256.New)
-		fmt.Print("|  ", time.Unix(timeParam, 0).Format(time.RFC3339), "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
+		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
 		fmt.Println(res2, "| SHA256   |")
 
 		res3 := generateTOTP(seed64, timeHex, digit, sha512.New)
-		fmt.Print("|  ", time.Unix(timeParam, 0).Format(time.RFC3339), "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
+		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
 		fmt.Println(res3, "| SHA512   |")
 
-		fmt.Println("+-----------------------------+---------------------------------+" + "------------------+---------+----------+")
+		fmt.Println("+ -------------------+---------------------------------+" + "------------------+---------+----------+")
 	}
 
 }
