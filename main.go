@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
 	"hash"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"time"
 )
 
+// base10 with n position base10^n
 var hotpDigitsPower = [...]int{
 	1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000,
 }
@@ -25,12 +27,11 @@ func hmacSHA(crypto func() hash.Hash, msg, secret []byte) []byte {
 func generateTOTP(secret []byte, hexTime string, digits int, crypto func() hash.Hash) string {
 	// First 8 bytes are for the movingFactor
 	// Compliant with base RFC 4226 (HOTP)
+	// for x := len(hexTime); x < 16; x++ {
+	// 	hexTime = "0" + hexTime
+	// }
 
-	for x := len(hexTime); x < 16; x++ {
-		hexTime = "0" + hexTime
-	}
-
-	msgbytes := []byte(hexTime)
+	msgbytes, _ := hex.DecodeString(hexTime)
 	hashBytes := hmacSHA(crypto, msgbytes, secret)
 
 	// get the last byte and do bitwise and with 4 bits
@@ -56,13 +57,13 @@ func generateTOTP(secret []byte, hexTime string, digits int, crypto func() hash.
 }
 
 func main() {
-	// Seed for HMAC-SHA1 - 20 bytes
-	seed := []byte("3132333435363738393031323334353637383930")
+	// // Seed for HMAC-SHA1 - 20 bytes
+	seed, _ := hex.DecodeString("3132333435363738393031323334353637383930")
 	// Seed for HMAC-SHA256 - 32 bytes
-	seed32 := []byte("3132333435363738393031323334353637383930" +
+	seed32, _ := hex.DecodeString("3132333435363738393031323334353637383930" +
 		"313233343536373839303132")
 	// Seed for HMAC-SHA512 - 64 bytes
-	seed64 := []byte("3132333435363738393031323334353637383930" +
+	seed64, _ := hex.DecodeString("3132333435363738393031323334353637383930" +
 		"3132333435363738393031323334353637383930" +
 		"3132333435363738393031323334353637383930" +
 		"31323334")
@@ -94,9 +95,8 @@ func main() {
 		T := (timeParam - T0) / X
 		timeHex := strings.ToUpper(fmt.Sprintf("%x", T))
 
-		timeHexDisplay := timeHex
-		for x := len(timeHexDisplay); x < 16; x++ {
-			timeHexDisplay = "0" + timeHexDisplay
+		for x := len(timeHex); x < 16; x++ {
+			timeHex = "0" + timeHex
 		}
 
 		timeParamDisplay := strconv.Itoa(int(timeParam))
@@ -105,18 +105,17 @@ func main() {
 		}
 
 		res := generateTOTP(seed, timeHex, digit, sha1.New)
-		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
+		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHex, " |")
 		fmt.Println(res, "| SHA1     |")
 
 		res2 := generateTOTP(seed32, timeHex, digit, sha256.New)
-		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
+		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHex, " |")
 		fmt.Println(res2, "| SHA256   |")
 
 		res3 := generateTOTP(seed64, timeHex, digit, sha512.New)
-		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHexDisplay, " |")
+		fmt.Print("|  ", timeParamDisplay, "  |  ", time.Unix(timeParam, 0).UTC(), "  | ", timeHex, " |")
 		fmt.Println(res3, "| SHA512   |")
 
 		fmt.Println("+ -------------------+---------------------------------+" + "------------------+---------+----------+")
 	}
-
 }

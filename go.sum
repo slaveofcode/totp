@@ -1,2 +1,4 @@
 github.com/mattn/go v0.0.0-20171011075504-07f7db3ea99f h1:wUGiIqMUWidYNHs5WgYo1fr6r8CP1P5zIz8XVf0MyxI=
 github.com/mattn/go v0.0.0-20171011075504-07f7db3ea99f/go.mod h1:er1RftId+06gzD11kJNzJAnQkIWK7Y35kiCPZWaO0TI=
+github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119 h1:YyPWX3jLOtYKulBR6AScGIs74lLrJcgeKRwcbAuQOG4=
+github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119/go.mod h1:/nuTSlK+okRfR/vnIPqR89fFKonnWPiZymN5ydRJkX8=
