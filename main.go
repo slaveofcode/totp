@@ -22,7 +22,7 @@ func hmacSHA(crypto func() hash.Hash, msg, secret []byte) []byte {
 	return mac.Sum(nil)
 }
 
-func generateTOTP(secret string, hexTime string, digits int, crypto func() hash.Hash) string {
+func generateTOTP(secret []byte, hexTime string, digits int, crypto func() hash.Hash) string {
 	// First 8 bytes are for the movingFactor
 	// Compliant with base RFC 4226 (HOTP)
 
@@ -31,8 +31,7 @@ func generateTOTP(secret string, hexTime string, digits int, crypto func() hash.
 	}
 
 	msgbytes := []byte(hexTime)
-	keyBytes := []byte(secret)
-	hashBytes := hmacSHA(crypto, msgbytes, keyBytes)
+	hashBytes := hmacSHA(crypto, msgbytes, secret)
 
 	// get the last byte and do bitwise and with 4 bits
 	offset := hashBytes[len(hashBytes)-1] & 0xf
@@ -58,15 +57,15 @@ func generateTOTP(secret string, hexTime string, digits int, crypto func() hash.
 
 func main() {
 	// Seed for HMAC-SHA1 - 20 bytes
-	seed := "3132333435363738393031323334353637383930"
+	seed := []byte("3132333435363738393031323334353637383930")
 	// Seed for HMAC-SHA256 - 32 bytes
-	seed32 := "3132333435363738393031323334353637383930" +
-		"313233343536373839303132"
+	seed32 := []byte("3132333435363738393031323334353637383930" +
+		"313233343536373839303132")
 	// Seed for HMAC-SHA512 - 64 bytes
-	seed64 := "3132333435363738393031323334353637383930" +
+	seed64 := []byte("3132333435363738393031323334353637383930" +
 		"3132333435363738393031323334353637383930" +
 		"3132333435363738393031323334353637383930" +
-		"31323334"
+		"31323334")
 	timeTests := []int64{
 		58,
 		59,
@@ -93,9 +92,9 @@ func main() {
 	digit := 8
 	for _, timeParam := range timeTests {
 		T := (timeParam - T0) / X
-		timeHex := fmt.Sprintf("%x", T)
+		timeHex := strings.ToUpper(fmt.Sprintf("%x", T))
 
-		timeHexDisplay := strings.ToUpper(timeHex)
+		timeHexDisplay := timeHex
 		for x := len(timeHexDisplay); x < 16; x++ {
 			timeHexDisplay = "0" + timeHexDisplay
 		}
