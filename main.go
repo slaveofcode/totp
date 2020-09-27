@@ -56,7 +56,7 @@ func generateTOTP(secret []byte, hexTime string, digits int, crypto func() hash.
 	return result
 }
 
-func printTables() {
+func printTable() {
 	// // Seed for HMAC-SHA1 - 20 bytes
 	seed, _ := hex.DecodeString("3132333435363738393031323334353637383930")
 	// Seed for HMAC-SHA256 - 32 bytes
@@ -121,5 +121,5 @@ func printTables() {
 }
 
 func main() {
-	printTables()
+	printTable()
 }
