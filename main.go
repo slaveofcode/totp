@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base32"
 	"encoding/hex"
 	"fmt"
 	"hash"
@@ -120,6 +121,26 @@ func printTable() {
 	}
 }
 
+func showKey(base32Secret string, digit int, interval int64) {
+	T0 := int64(0)
+	byteSecret, _ := base32.StdEncoding.DecodeString(strings.ToUpper(base32Secret))
+
+	for {
+		currUnixTime := time.Now().Unix()
+		T := (currUnixTime - T0) / interval
+		timeHex := strings.ToUpper(fmt.Sprintf("%x", T))
+
+		// left padding
+		for x := len(timeHex); x < 16; x++ {
+			timeHex = "0" + timeHex
+		}
+
+		fmt.Println("Current Key:", generateTOTP(byteSecret, timeHex, digit, sha1.New))
+		time.Sleep(time.Second * 2)
+	}
+}
+
 func main() {
+	// showKey("HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ", 6, 30)
 	printTable()
 }
