@@ -19,8 +19,8 @@ var hotpDigitsPower = [...]int{
 }
 
 func hmacSHA(crypto func() hash.Hash, msg, secret []byte) []byte {
-	mac := hmac.New(crypto, []byte(secret))
-	mac.Write([]byte(msg))
+	mac := hmac.New(crypto, secret)
+	mac.Write(msg)
 	return mac.Sum(nil)
 }
 
