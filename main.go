@@ -28,9 +28,9 @@ func hmacSHA(crypto func() hash.Hash, msg, secret []byte) []byte {
 func generateTOTP(secret []byte, hexTime string, digits int, crypto func() hash.Hash) string {
 	// First 8 bytes are for the movingFactor
 	// Compliant with base RFC 4226 (HOTP)
-	// for x := len(hexTime); x < 16; x++ {
-	// 	hexTime = "0" + hexTime
-	// }
+	for x := len(hexTime); x < 16; x++ {
+		hexTime = "0" + hexTime
+	}
 
 	msgbytes, _ := hex.DecodeString(hexTime)
 	hashBytes := hmacSHA(crypto, msgbytes, secret)
